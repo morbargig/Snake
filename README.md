@@ -1,4 +1,4 @@
-# Snake
+# Snake Game 🐍
 
 ```bash
 $ git clone https://github.com/morbargig/Snake.git
