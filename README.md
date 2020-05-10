@@ -1,11 +1,7 @@
 # Snake
 
 ```bash
-$ git clone
-```
-```python
+$ git clone https://github.com/morbargig/Snake.git
 pip install pygame
-```
-```bash
 py game.py
 ```
