@@ -152,6 +152,7 @@ while run:
             i.x, i.y = lastx, lasty
             lastx, lasty = newx, newy
 
+
         for i in moves2:
             if (lastx2, lasty2) == (i.x, i.y) or (player2.x, player2.y) == (lastx2, lasty2):
                 break
