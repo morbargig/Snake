@@ -23,27 +23,8 @@ class BasicSprite(object):
     def draw(self, window):
         window.blit(self.image, (self.x, self.y))
 
-
 pygame.init()
 pygame.mixer.init()
-screen = pygame.display.set_mode((width, heigth))
-pygame.display.set_caption('Bargig Snake')
-clock = pygame.time.Clock()
-player = BasicSprite(10, 10, (255, 0, 0))
-player2 = BasicSprite(10, 10, (255, 0, 0))
-
-enemies = []
-for i in range(0, random.randrange(300)):
-    enemies.append(BasicSprite(10, 10, (random.randrange(200), random.randrange(
-        255), random.randrange(255)), (random.randrange(heigth), random.randrange(width))))
-
-
-# Main loop/ Game loop
-
-eatSound = pygame.mixer.Sound('eatSound.wav')
-# pygame.mixer.music.sound.load('eatSound.wav')
-# music = pygame.mixer.music.load('music.mp3')
-# pygame.mixer.music.play(-1)
 run = True
 loopNmber = 0
 joump = False
@@ -52,6 +33,32 @@ moves2 = []
 computer= True
 showText = False
 losee = False
+pygame.display.set_caption('Bargig Snake')
+screen = pygame.display.set_mode((width, heigth))
+player = BasicSprite(10, 10, (255, 0, 0))
+player2 = BasicSprite(10, 10, (255, 0, 0))
+clock = pygame.time.Clock()
+eatSound = pygame.mixer.Sound('eatSound.wav')
+enemies = []
+# Main loop/ Game loop
+pygame.mixer.music.sound.load('eatSound.wav')
+music = pygame.mixer.music.load('music.mp3')
+pygame.mixer.music.play(-1)
+def startGame ():
+    global enemies,run,loopNmber,joump,moves,moves2,computer,showText,losee
+    enemies = []
+    for i in range(0, random.randrange(300)):
+        enemies.append(BasicSprite(10, 10, (random.randrange(200), random.randrange(
+            255), random.randrange(255)), (random.randrange(heigth), random.randrange(width))))
+    run = True
+    loopNmber = 0
+    joump = False
+    moves = []
+    moves2 = []
+    computer= True
+    showText = False
+    losee = False
+startGame()
 while run:
     loopNmber += 1
     lastx = player.x
