@@ -4,8 +4,8 @@ import time
 # import sys
 # print(sys.executable)
 # exit()
-width, heigth = 1000, 960
 
+width, heigth = 800, 768
 
 class BasicSprite(object):
     def __init__(self, heigth, width, color, xy=False, screen={'width': width, "heigth": heigth}):
@@ -25,6 +25,9 @@ class BasicSprite(object):
 
 pygame.init()
 pygame.mixer.init()
+eatSound = pygame.mixer.Sound('eatSound.wav')
+# pygame.mixer.music.load('music.mp3')
+# pygame.mixer.music.play(-1)
 run = True
 loopNmber = 0
 joump = False
@@ -33,32 +36,44 @@ moves2 = []
 computer= True
 showText = False
 losee = False
+actTry=5
 pygame.display.set_caption('Bargig Snake')
 screen = pygame.display.set_mode((width, heigth))
-player = BasicSprite(10, 10, (255, 0, 0))
-player2 = BasicSprite(10, 10, (255, 0, 0))
+player = BasicSprite(10, 10, (255, 0, 0),[int(random.randrange(int(width/2),width)),heigth])
+player2 = BasicSprite(10, 10, (255, 0, 0),[int(random.randrange(1,int(width/2))),heigth])
 clock = pygame.time.Clock()
-eatSound = pygame.mixer.Sound('eatSound.wav')
 enemies = []
 # Main loop/ Game loop
-pygame.mixer.music.sound.load('eatSound.wav')
-music = pygame.mixer.music.load('music.mp3')
-pygame.mixer.music.play(-1)
+def menu():
+    while(True):
+        screen.fill((255, 255, 255))
+        textHeigth = heigth // 2
+        for i in ["start game","end game","1 player","play agin computer","play agin frined"]:
+            font = pygame.font.Font('freesansbold.ttf', 32)
+            text = font.render(i, True, (0,0,255), (255, 0, 0))
+            textRect = text.get_rect()
+            textRect.center = (width // 2, textHeigth)
+            screen.blit(text, textRect)
+            textHeigth+=40
+        print(pygame.mouse.get_pressed,pygame.mouse.get_pos)
+        pygame.display.update()
+        clock.tick(30)
+menu()
 def startGame ():
-    global enemies,run,loopNmber,joump,moves,moves2,computer,showText,losee
+    global enemies,run,loopNmber,joump,moves,moves2,showText,losee,actTry
     enemies = []
     for i in range(0, random.randrange(300)):
         enemies.append(BasicSprite(10, 10, (random.randrange(200), random.randrange(
             255), random.randrange(255)), (random.randrange(heigth), random.randrange(width))))
     run = True
+    actTry = 0
     loopNmber = 0
     joump = False
     moves = []
     moves2 = []
-    computer= True
     showText = False
     losee = False
-startGame()
+# startGame()
 while run:
     loopNmber += 1
     lastx = player.x
@@ -69,9 +84,12 @@ while run:
         if event.type == pygame.QUIT:
             run = False
     keys = pygame.key.get_pressed()
-    if losee and keys[pygame.K_p]:
+    if losee :
         # run = True
         losee =False
+        # startGame()
+        menu()
+        break
     if not losee:
         if loopNmber % 5 == 0:
             loopNmber = 0
@@ -131,39 +149,44 @@ while run:
                     player2.x -= 5
                 else:
                     player2.x = width - 5
-        enemieIndex = None
-        enemie = None
-        optionalEnemies = enemies[:]
-        
-        # bedEnemies =[]
-        # while(True):
-        actlist = [0,0]
-        def act():
-            minDistance = ((heigth**2) + (width**2) )**0.5
-            global actlist, enemie
-            actlist= [0,0]
-            for i in optionalEnemies:
-                newDis =  ( (abs(player2.x - i.x)**2) + (abs(player2.y - i.y)**2))**0.5
-                if newDis < minDistance:
-                    minDistance = newDis
-                    enemie = i
-            yDic = player2.y - enemie.y
-            xDic = player2.x - enemie.x
-            if abs(yDic) > abs(xDic):
-                if yDic > 0:
-                    actlist[0] -= 5
-                else :  actlist[0] += 5
-            elif xDic > 0 :
-                actlist[1]-=5
-            else : actlist[1]+=5
-            player2.y += actlist[0]
-            player2.x +=actlist[1]
-        def unAct ():
-            optionalEnemies.remove(enemie)
-            player2.y -= actlist[0]
-            player2.x -=actlist[1]
-        if computer:
-            act()
+        else : 
+            enemieIndex = None
+            enemie = None
+            optionalEnemies = enemies[:]
+            
+            # bedEnemies =[]
+            # while(True):
+            actlist = [0,0]
+            
+            def act():
+                global actTry
+                actTry+=1
+                minDistance = ((heigth**2) + (width**2) )**0.5
+                global actlist, enemie
+                actlist= [0,0]
+                for i in optionalEnemies:
+                    newDis =  int(( (abs(player2.x - i.x)**2) + (abs(player2.y - i.y)**2))**0.5)
+                    if newDis < minDistance:
+                        minDistance = newDis
+                        enemie = i
+                yDic = player2.y - enemie.y
+                xDic = player2.x - enemie.x
+                if abs(yDic) > abs(xDic):
+                    if yDic > 0:
+                        actlist[0] -= 5
+                    else :  actlist[0] += 5
+                elif xDic > 0 :
+                    actlist[1]-=5
+                else : actlist[1]+=5
+                player2.y += actlist[0]
+                player2.x +=actlist[1]
+            def unAct ():
+                if enemie in optionalEnemies:
+                    optionalEnemies.remove(enemie)
+                player2.y -= actlist[0]
+                player2.x -=actlist[1]
+            if computer:
+                act()
         # print(enemieIndex)
 
 
@@ -198,8 +221,17 @@ while run:
                 break
             if computer :
                 while(abs( i.x -player2.x) < player2.width ) and ( abs(i.y -player2.y)  < player2.heigth):
-                    unAct()
-                    act()
+                    if actTry < 10:
+                        unAct()
+                        act()
+                    elif (abs( i.x -player2.x) < player2.width ) and ( abs(i.y -player2.y)  < player2.heigth):
+                        font = pygame.font.Font('freesansbold.ttf', 32)
+                        text = font.render('player 1 win !', True, (0, 255, 0), (0, 0, 255))
+                        textRect = text.get_rect()
+                        textRect.center = (width // 2, heigth // 2)
+                        losee = True
+                        showText = True
+                        break
             else:
                 if (abs( i.x -player2.x) < player2.width ) and ( abs(i.y -player2.y)  < player2.heigth):
                     font = pygame.font.Font('freesansbold.ttf', 32)
